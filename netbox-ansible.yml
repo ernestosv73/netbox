@@ -11,17 +11,18 @@ topology:
       type: ixrd3
       startup-config: configs/srlrouter.cfg    
 
-     
+    srlswitch:
+      kind: nokia_srlinux
+      labels:
+        graph-icon: switch
+      image: ghcr.io/nokia/srlinux:24.10.1
+      type: ixrd3
+      startup-config: switch/srlswitch.cfg 
     
-    PC1:
+    ansible:
       kind: linux
-      image: docker.io/esanchezv/kaliipv6:latest
-      exec:
-        - "sysctl net.ipv6.conf.eth1.addr_gen_mode=3"
-        - "sysctl net.ipv6.conf.eth1.addr_gen_mode=2"
-        - "sysctl net.ipv6.conf.eth1.use_tempaddr=2"  
-        #- ip -6 route del default dev eth0
-
+      image: xaviaznar/ansible:2.16
+     
     PC2:
       kind: linux
       image: docker.io/esanchezv/kaliipv6:latest  
@@ -41,10 +42,10 @@ topology:
         #- ip -6 route del default dev eth0    
       
   links:
-   - endpoints: ["srlrouter:e1-1", "ceos:eth1"]  
-   - endpoints: ["ceos:eth2", "gNMIc:eth1"] 
-   - endpoints: ["ceos:eth3", "PC1:eth1"]   
-   - endpoints: ["ceos:eth4", "PC2:eth1"]   
-   - endpoints: ["ceos:eth5", "PC3:eth1"]   
-   - endpoints: ["ceos:eth6", "PC4:eth1"]   
+   - endpoints: ["srlrouter:e1-1", "srlswitch:e1-1"]  
+   - endpoints: ["srlswitch:e1-2", "ansible:eth1"] 
+   - endpoints: ["srlswitch:e1-3", "PC2:eth1"]   
+   - endpoints: ["srlswitch:e1-4", "PC3:eth1"]   
+   - endpoints: ["srlswitch:e1-5", "PC4:eth1"]   
+   
     
