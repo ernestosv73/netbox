@@ -22,6 +22,8 @@ topology:
     ansible:
       kind: linux
       image: xaviaznar/ansible:2.16
+      binds:
+        - configs/ansible/automation:/root/automation
      
     PC2:
       kind: linux
