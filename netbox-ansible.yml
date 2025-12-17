@@ -17,7 +17,7 @@ topology:
         graph-icon: switch
       image: ghcr.io/nokia/srlinux:24.10.1
       type: ixrd3
-      startup-config: switch/srlswitch.cfg 
+      startup-config: configs/srlswitch.cfg 
     
     ansible:
       kind: linux
