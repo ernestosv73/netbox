@@ -33,9 +33,13 @@ topology:
      
     PC2:
       kind: linux
-      image: docker.io/esanchezv/kaliipv6:latest  
-      #exec:
-        #- ip -6 route del default dev eth0
+      image: esanchezv/hellt-gnmic:latest
+      binds:
+        - configs/nano.sh:/root/nano.sh
+        - configs/ansible/automation:/root/automation
+      exec:
+         - chmod +x /root/nano.sh
+         - sh /root/nano.sh      
 
     PC3:
       kind: linux
