@@ -8,3 +8,9 @@ apk add --no-cache ansible py3-pip
 sleep 1
 pip3 install pynetbox
 sleep 1
+pip3 install netaddr
+sleep 1
+pip3 install pytz
+sleep 1
+ansible-galaxy collection install netbox.netbox
+sleep 1
