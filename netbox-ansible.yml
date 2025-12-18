@@ -21,25 +21,25 @@ topology:
       type: ixrd3
       startup-config: configs/srlswitch.cfg 
     
-    ansible:
-      kind: linux
-      image: xaviaznar/ansible:2.16
-      binds:
-        - configs/nano.sh:/root/nano.sh
-        - configs/ansible/automation:/root/automation
-      exec:
-         - chmod +x /root/nano.sh
-         - sh /root/nano.sh      
+    #ansible:
+      #kind: linux
+      #image: xaviaznar/ansible:2.16
+      #binds:
+        #- configs/nano.sh:/root/nano.sh
+        #- configs/ansible/automation:/root/automation
+      #exec:
+         #- chmod +x /root/nano.sh
+         #- sh /root/nano.sh      
      
-    PC2:
+    ansible:
       kind: linux
       image: esanchezv/hellt-gnmic:latest
       binds:
-        - configs/nano.sh:/root/nano.sh
+        - configs/ansible.sh:/root/ansible.sh
         - configs/ansible/automation:/root/automation
       exec:
-         - chmod +x /root/nano.sh
-         - sh /root/nano.sh      
+         - chmod +x /root/ansible.sh
+         - sh /root/ansible.sh      
 
     PC3:
       kind: linux
@@ -56,7 +56,6 @@ topology:
   links:
    - endpoints: ["srlrouter:e1-1", "srlswitch:e1-1"]  
    - endpoints: ["srlswitch:e1-2", "ansible:eth1"] 
-   - endpoints: ["srlswitch:e1-3", "PC2:eth1"]   
    - endpoints: ["srlswitch:e1-4", "PC3:eth1"]   
    - endpoints: ["srlswitch:e1-5", "PC4:eth1"]   
    
