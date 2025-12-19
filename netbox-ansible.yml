@@ -29,8 +29,8 @@ topology:
        - configs/ansible.sh:/ansible.sh      
        - configs/ansible/automation:/root/automation
       exec:
-       #- chmod +x /ansible.sh
-       #- bash /ansible.sh 
+       - chmod +x /ansible.sh
+       - bash /ansible.sh 
        - chmod 644 /root/automation/ansible.cfg    
     
     PC3:
