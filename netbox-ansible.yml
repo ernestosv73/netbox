@@ -24,7 +24,7 @@ topology:
         
     ansible:
       kind: linux
-      image: docker.io/esanchezv/kaliipv6:latest
+      image: esanchezv/kali-python3:latest
       binds:
        - configs/ansible/automation:/root/automation
       exec:
