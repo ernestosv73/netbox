@@ -1,0 +1,11 @@
+plugin: netbox.netbox.nb_inventory
+api_endpoint: http://netbox-docker-netbox-1:8080
+token: 086705f35a0a4e01bd6c202ee2caf67b4d193fb6
+
+validate_certs: false
+
+group_by:
+  - device_roles
+
+compose:
+  ansible_host: primary_ip.address
