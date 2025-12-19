@@ -27,8 +27,8 @@ topology:
       image: esanchezv/ansible:latest
       binds:
        - configs/ansible/automation:/root/automation
-      #exec:
-        #- ip -6 route del default dev eth0    
+      exec:
+       - chmod 644 /root/automation/ansible.cfg    
     
     PC3:
       kind: linux
