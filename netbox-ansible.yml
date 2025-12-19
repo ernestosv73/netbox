@@ -21,17 +21,7 @@ topology:
       type: ixrd3
       startup-config: configs/srlswitch.cfg 
     
-    #ansible:
-      #kind: linux
-      #image: xaviaznar/ansible:2.16
-      #binds:
-        #- configs/nano.sh:/root/nano.sh
-        #- configs/ansible/automation:/root/automation
-      #exec:
-         #- chmod +x /root/nano.sh
-         #- sh /root/nano.sh      
-     
-    
+        
     PC2:
       kind: linux
       image: docker.io/esanchezv/kaliipv6:latest
