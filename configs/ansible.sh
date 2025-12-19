@@ -1,7 +1,7 @@
 echo "crear directorio"
 mkdir ansible-netbox
 sleep 1
-echo "cambiar a directorio!
+echo "cambiar a directorio"
 cd ansible-netbox
 sleep 1
 echo "crear contenedor"
