@@ -22,9 +22,9 @@ topology:
       startup-config: configs/srlswitch.cfg 
     
         
-    PC2:
+    ansible:
       kind: linux
-      image: docker.io/esanchezv/kaliipv6:latest
+      image: esanchezv/ansible:latest
       binds:
        - configs/ansible/automation:/root/automation
       #exec:
@@ -44,9 +44,9 @@ topology:
       
   links:
    - endpoints: ["srlrouter:e1-1", "srlswitch:e1-1"]  
-   #- endpoints: ["srlswitch:e1-2", "ansible:eth1"]
-   - endpoints: ["srlswitch:e1-3", "PC2:eth1"]
-   - endpoints: ["srlswitch:e1-4", "PC3:eth1"]   
-   - endpoints: ["srlswitch:e1-5", "PC4:eth1"]   
+   - endpoints: ["srlswitch:e1-2", "ansible:eth1"]
+   - endpoints: ["srlswitch:e1-3", "PC3:eth1"]
+   - endpoints: ["srlswitch:e1-4", "PC4:eth1"]   
+   #- endpoints: ["srlswitch:e1-5", "PC4:eth1"]   
    
     
