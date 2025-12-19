@@ -26,11 +26,11 @@ topology:
       kind: linux
       image: esanchezv/kali-python3:latest
       binds:
-       - configs/ansible.sh:/tmp/ansible.sh      
+       - configs/setup-venv.sh:/root/setup-venv.sh      
        - configs/ansible/automation:/root/automation
       exec:
-       - chmod +x /tmp/ansible.sh
-       #- bash /tmp/ansible.sh 
+       - chmod +x /root/setup-venv.sh
+       - source /root/setup-venv.sh 
        - chmod 644 /root/automation/ansible.cfg    
     
     PC3:
