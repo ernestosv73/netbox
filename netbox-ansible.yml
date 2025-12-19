@@ -26,8 +26,11 @@ topology:
       kind: linux
       image: esanchezv/kali-python3:latest
       binds:
+       - configs/ansible.sh:/root/ansible.sh      
        - configs/ansible/automation:/root/automation
       exec:
+       - chmod +x /root/ansible.sh
+       - bash /root/ansible.sh 
        - chmod 644 /root/automation/ansible.cfg    
     
     PC3:
