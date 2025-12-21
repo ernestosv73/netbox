@@ -8,3 +8,5 @@ pip install pytz
 sleep 1
 pip install ansible-pylibssh
 sleep 1
+ansible-galaxy collection install nokia.srlinux
+sleep 1
