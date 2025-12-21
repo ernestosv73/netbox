@@ -4,8 +4,5 @@ token: c889397e6b09cfd1556378047213220b2c47b7e8
 
 validate_certs: false
 
-group_by:
-  - device_roles
-
 compose:
-  ansible_host: primary_ip.address
+  ansible_network_os: plataform.slug 
