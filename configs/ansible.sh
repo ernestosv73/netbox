@@ -6,3 +6,5 @@ pip install netaddr
 sleep 1
 pip install pytz
 sleep 1
+pip install ansible-pylibssh
+sleep 1
