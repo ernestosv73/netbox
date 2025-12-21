@@ -1,6 +1,6 @@
 plugin: netbox.netbox.nb_inventory
-api_endpoint: http://netbox-docker-netbox-1:8080
-token: 086705f35a0a4e01bd6c202ee2caf67b4d193fb6
+api_endpoint: http://netbox-plugins-netbox-1:8080
+token: c889397e6b09cfd1556378047213220b2c47b7e8
 
 validate_certs: false
 
