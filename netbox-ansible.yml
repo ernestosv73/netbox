@@ -24,7 +24,7 @@ topology:
         
     ansible:
       kind: linux
-      image: esanchezv/kali-python3:latest
+      image: docker.io/esanchezv/kaliipv6:latest 
       binds:
        - configs/setup-venv.sh:/root/setup-venv.sh
        - configs/ansible.sh:/root/ansible.sh
