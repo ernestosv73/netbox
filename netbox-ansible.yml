@@ -5,12 +5,11 @@ mgmt:
 topology:
   nodes:
 
-    srlrouter:
-      kind: nokia_srlinux
+    huawei-router:
+      kind: huawei_vrp
       mgmt-ipv4: 172.80.80.7
-      image: ghcr.io/nokia/srlinux:24.10.1
-      type: ixrd3
-      startup-config: configs/srlrouter.cfg    
+      image: vrnetlab/huawei_vrp:ne40e-8.180
+      #startup-config: configs/srlrouter.cfg    
 
     srlswitch:
       kind: nokia_srlinux
@@ -46,7 +45,7 @@ topology:
         #- ip -6 route del default dev eth0    
       
   links:
-   - endpoints: ["srlrouter:e1-1", "srlswitch:e1-1"]  
+   - endpoints: ["huawei-router:eth1", "srlswitch:e1-1"]  
    - endpoints: ["srlswitch:e1-2", "ansible:eth1"]
    - endpoints: ["srlswitch:e1-3", "PC3:eth1"]
    - endpoints: ["srlswitch:e1-4", "PC4:eth1"]   
