@@ -3,6 +3,5 @@ api_endpoint: http://netbox-plugins-netbox-1:8080
 token: c889397e6b09cfd1556378047213220b2c47b7e8
 
 validate_certs: false
-
 compose:
   ansible_network_os: platform.slug 
