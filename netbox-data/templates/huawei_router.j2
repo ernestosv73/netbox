@@ -1,24 +1,16 @@
-sysname {{ device.name }}
-system-view
-
 interface {{ intf.name }}
 {%- if intf.description %} description {{ intf.description }}{% endif %}
  ipv6 enable
 
-{# IPs IPv6 asignadas #}
+{# IPs IPv6 #}
 {% for ip in intf.ip_addresses.all() | selectattr('family.value', '==', 6) %}
  ipv6 address {{ ip.address }}
 {% endfor %}
 
-{# ¿Enviar Router Advertisements? #}
-{%- if intf.custom_fields.get('ipv6_ra', 'disabled') == 'enabled' %}
+{# Solo si tiene tag 'ipv6-ra' #}
+{%- if 'ipv6-ra' in intf.tags | map(attribute='name') %}
  undo ipv6 nd ra halt
-{%- else %}
- ipv6 nd ra halt
 {%- endif %}
 
  undo shutdown
 quit
-
-commit
-return
