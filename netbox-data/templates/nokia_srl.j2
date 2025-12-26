@@ -1,0 +1,68 @@
+# Configuration generated for {{ device.name }} ({{ device.platform.name }})
+
+/configure {
+{# --- System --- #}
+  system {
+    information {
+      description "{{ device.comments | default('Automated by NetBox') }}";
+    }
+    hostname "{{ device.name }}";
+  }
+
+{# --- Interfaces --- #}
+  interface {
+{% for intf in device.interfaces.all() | selectattr('enabled') %}
+    {# Solo interfaces físicas o LAGs (no subinterfaces ni loopbacks aquí) #}
+    {% if intf.type.value in ['10gbase-x-sfpp', '25gbase-x-sfps', '100gbase-x-qsfp28', 'lag'] %}
+    "{{ intf.name | replace('/', '-') | lower }}-{{ intf.name | regex_replace('.*/', '') }}" {
+      description "{{ intf.description | default(intf.name) }}";
+      admin-state enable;
+      subinterface 0 {
+        admin-state enable;
+        {% for ip in intf.ip_addresses.all() | selectattr('status.value', '==', 'active') %}
+        {% if ip.family.value == 4 %}
+        ipv4 {
+          admin-state enable;
+          address "{{ ip.address.ip }}/{{ ip.address.prefix_length }}" {
+          }
+        }
+        {% elif ip.family.value == 6 %}
+        ipv6 {
+          admin-state enable;
+          address "{{ ip.address }}" {
+          }
+        }
+        {% endif %}
+        {% endfor %}
+      }
+    }
+    {% endif %}
+{% endfor %}
+
+{# --- Loopbacks --- #}
+{% for lo in device.interfaces.all() | selectattr('type.value', '==', 'virtual') | selectattr('role.value', '==', 'loopback') %}
+    "{{ lo.name | lower }}" {
+      description "{{ lo.description | default('Loopback') }}";
+      admin-state enable;
+      subinterface 0 {
+        admin-state enable;
+        {% for ip in lo.ip_addresses.all() | selectattr('status.value', '==', 'active') %}
+        {% if ip.family.value == 4 %}
+        ipv4 {
+          admin-state enable;
+          address "{{ ip.address.ip }}/{{ ip.address.prefix_length }}" {
+          }
+        }
+        {% elif ip.family.value == 6 %}
+        ipv6 {
+          admin-state enable;
+          address "{{ ip.address }}" {
+          }
+        }
+        {% endif %}
+        {% endfor %}
+      }
+    }
+{% endfor %}
+  }
+}
