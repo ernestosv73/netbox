@@ -21,16 +21,16 @@ topology:
       startup-config: configs/srlswitch.cfg 
     
         
-    #ansible:
-      #kind: linux
-      #image: esanchezv/kali-python3:latest 
-      #binds:
-       #- configs/setup-venv.sh:/root/setup-venv.sh
-       #- configs/ansible.sh:/root/ansible.sh
-       #- configs/ansible/automation:/root/automation
-      #exec:
-       #- chmod +x /root/setup-venv.sh
-       #- chmod 644 /root/automation/ansible.cfg    
+    ansible:
+      kind: linux
+      image: esanchezv/kali-python3:latest 
+      binds:
+       - configs/setup-venv.sh:/root/setup-venv.sh
+       - configs/ansible.sh:/root/ansible.sh
+       - configs/ansible/automation:/root/automation
+      exec:
+       - chmod +x /root/setup-venv.sh
+       - chmod 644 /root/automation/ansible.cfg    
     
     gNMIc:
       kind: linux
@@ -61,6 +61,6 @@ topology:
    - endpoints: ["srlswitch:e1-2", "gNMIc:eth1"]
    - endpoints: ["srlswitch:e1-3", "PC3:eth1"]
    - endpoints: ["srlswitch:e1-4", "PC4:eth1"]   
-   #- endpoints: ["srlswitch:e1-5", "PC4:eth1"]   
+   - endpoints: ["srlswitch:e1-5", "ansible:eth1"]   
    
     
