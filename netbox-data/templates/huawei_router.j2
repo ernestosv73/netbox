@@ -1,0 +1,22 @@
+sysname {{ device.name }}
+
+{% for intf in device.interfaces.all() %}
+{% if intf.enabled %}
+
+interface {{ intf.name }}
+{% if intf.description %}
+ description {{ intf.description }}
+{% endif %}
+
+{% for ip in intf.ip_addresses.all() %}
+{% if ip.family.value == 4 %}
+ ip address {{ ip.address.ip }} {{ ip.address.netmask }}
+{% elif ip.family.value == 6 %}
+ ipv6 enable
+ ipv6 address {{ ip.address }}
+{% endif %}
+{% endfor %}
+
+ quit
+{% endif %}
+{% endfor %}
