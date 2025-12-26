@@ -1,22 +1,24 @@
 sysname {{ device.name }}
-
-{% for intf in device.interfaces.all() %}
-{% if intf.enabled %}
+system-view
 
 interface {{ intf.name }}
-{% if intf.description %}
- description {{ intf.description }}
-{% endif %}
-
-{% for ip in intf.ip_addresses.all() %}
-{% if ip.family.value == 4 %}
- ip address {{ ip.address.ip }} {{ ip.address.netmask }}
-{% elif ip.family.value == 6 %}
+{%- if intf.description %} description {{ intf.description }}{% endif %}
  ipv6 enable
+
+{# IPs IPv6 asignadas #}
+{% for ip in intf.ip_addresses.all() | selectattr('family.value', '==', 6) %}
  ipv6 address {{ ip.address }}
-{% endif %}
 {% endfor %}
 
- quit
-{% endif %}
-{% endfor %}
+{# ¿Enviar Router Advertisements? #}
+{%- if intf.custom_fields.get('ipv6_ra', 'disabled') == 'enabled' %}
+ undo ipv6 nd ra halt
+{%- else %}
+ ipv6 nd ra halt
+{%- endif %}
+
+ undo shutdown
+quit
+
+commit
+return
