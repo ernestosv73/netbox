@@ -12,8 +12,9 @@ interface {{ intf.name }}
  ipv6 address {{ ip.address }}
 {% endfor %}
 
-{# RA solo si tiene tag 'ipv6-ra' #}
-{%- if 'ipv6-ra' in intf.tags | map(attribute='name') | list %}
+{# RA: solo si tiene tag 'ipv6-ra' #}
+{%- set tag_names = intf.tags.all() | map(attribute='name') | list -%}
+{%- if 'ipv6-ra' in tag_names %}
  undo ipv6 nd ra halt
 {%- endif %}
 
@@ -24,4 +25,3 @@ quit
 
 commit
 return
-
