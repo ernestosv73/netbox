@@ -9,7 +9,7 @@ topology:
       kind: huawei_vrp
       mgmt-ipv4: 172.80.80.7
       image: vrnetlab/huawei_vrp:ne40e-8.180
-      #startup-config: configs/srlrouter.cfg    
+      startup-config: configs/myconfig.txt    
 
     srlswitch:
       kind: nokia_srlinux
@@ -25,12 +25,12 @@ topology:
       kind: linux
       image: esanchezv/kali-python3:latest 
       binds:
-       - configs/netmiko.sh:/root/netmiko.sh
+       - configs/nornir.sh:/root/nornir.sh
        - configs/ansible.sh:/root/ansible.sh
        - configs/ansible/automation:/root/automation
       exec:
        - python3 -m pip config set global.break-system-packages true
-       - chmod +x /root/netmiko.sh
+       - chmod +x /root/nornir.sh
        - chmod 644 /root/automation/ansible.cfg    
     
     gNMIc:
