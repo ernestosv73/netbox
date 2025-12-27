@@ -8,15 +8,14 @@ interface {{ intf.name }}
 {% if intf.description %} description {{ intf.description }}{% endif %}
  ipv6 enable
 
-{# Obtener direcciones IPv6 #}
+{# Direcciones IPv6 #}
 {% set ipv6_addresses = intf.ip_addresses.all() | selectattr('family', 'equalto', 6) %}
 {% for ip in ipv6_addresses %}
  ipv6 address {{ ip.address }}
 {% endfor %}
 
-{# Verificar si tiene el tag 'ipv6-ra' #}
-{% set tag_names = intf.tags.all() | map(attribute='name') | list %}
-{% if 'ipv6-ra' in tag_names %}
+{# IPv6 RA usando Custom Field #}
+{% if intf.cf and intf.cf.ipv6_ra_enabled %}
  undo ipv6 nd ra halt
 {% endif %}
 
