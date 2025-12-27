@@ -4,4 +4,6 @@ pip install nornir nornir-netmiko nornir-napalm nornir-utils
 sleep 3
 pip install pynetbox
 sleep 1
+pip install python-dotenv
+sleep 1
 
