@@ -1,24 +1,27 @@
 sysname {{ device.name }}
 system-view
 
-{% for intf in device.interfaces | selectattr('enabled') %}
-
+{% for intf in device.interfaces.all %}
+  {% if intf.enabled %}
 interface {{ intf.name }}
-{%- if intf.description %} description {{ intf.description }}{% endif %}
- ipv6 enable
+    {% if intf.description %} description {{ intf.description }}{% endif %}
+    ipv6 enable
 
-{# IPs IPv6 #}
-{% for ip in intf.ip_addresses | selectattr('family', 'equalto', 6) %}
- ipv6 address {{ ip.address }}
-{% endfor %}
+    {# IPs IPv6 #}
+    {% for ip in intf.ip_addresses.all %}
+      {% if ip.family == 6 %}
+    ipv6 address {{ ip.address }}
+      {% endif %}
+    {% endfor %}
 
-{# RA: solo si tiene tag 'ipv6-ra' #}
-{%- set tag_names = intf.tags | map(attribute='name') | list -%}
-{%- if 'ipv6-ra' in tag_names %}
- undo ipv6 nd ra halt
-{%- endif %}
+    {# RA: solo si tiene tag 'ipv6-ra' #}
+    {% set tag_names = intf.tags.all | map(attribute='name') | list %}
+    {% if 'ipv6-ra' in tag_names %}
+    undo ipv6 nd ra halt
+    {% endif %}
 
- undo shutdown
+    undo shutdown
 quit
-
+  {% endif %}
 {% endfor %}
+
