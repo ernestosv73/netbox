@@ -1,20 +1,19 @@
 sysname {{ device.name }}
 system-view
 
-{# --- Iterar sobre todas las interfaces habilitadas --- #}
 {% for intf in device.interfaces.all() | selectattr('enabled') %}
 
 interface {{ intf.name }}
 {%- if intf.description %} description {{ intf.description }}{% endif %}
  ipv6 enable
 
-{# IPs IPv6 asignadas a esta interfaz #}
+{# IPs IPv6 #}
 {% for ip in intf.ip_addresses.all() | selectattr('family.value', '==', 6) %}
  ipv6 address {{ ip.address }}
 {% endfor %}
 
-{# Solo si tiene tag 'ipv6-ra' #}
-{%- if 'ipv6-ra' in intf.tags | map(attribute('name') | list %}
+{# RA solo si tiene tag 'ipv6-ra' #}
+{%- if 'ipv6-ra' in intf.tags | map(attribute='name') | list %}
  undo ipv6 nd ra halt
 {%- endif %}
 
@@ -25,3 +24,4 @@ quit
 
 commit
 return
+
