@@ -1,73 +1,58 @@
-{# fortigate_interfaces_simple.j2 #}
-{# Template simplificado solo para configuración de interfaces IPv6 #}
-
+{# fortigate_netbox_template.j2 #}
 config system interface
-{% for intf in interfaces %}
-{% if intf.enabled %}
-  edit "{{ intf.name }}"
-    set vdom "root"
-    {% if intf.description %}set description "{{ intf.description }}"{% endif %}
-    
-    {# Configuración IPv4 #}
-    {% if intf.ipv4_address %}
-    set ip {{ intf.ipv4_address }}
+{% for intf in device.interfaces.all() if intf.enabled %}
+edit "{{ intf.name }}"
+  set vdom "root"
+  {% if intf.description %}set description "{{ intf.description }}"{% endif %}
+  
+  {# IPv4 Configuration #}
+  {% set ipv4_addresses = intf.ip_addresses.all()|selectattr('family.value', '==', 4)|list %}
+  {% if ipv4_addresses %}
+    {% for ip in ipv4_addresses %}
+  set ip {{ ip.address }}
+    {% endfor %}
+  {% else %}
+  set mode dhcp
+  {% endif %}
+  
+  {# IPv6 Configuration #}
+  config ipv6
+    {% set ipv6_addresses = intf.ip_addresses.all()|selectattr('family.value', '==', 6)|list %}
+    {% if ipv6_addresses %}
+    set ip6-mode static
+    config ip6-address
+      {% for ip in ipv6_addresses %}
+      edit {{ loop.index }}
+        set ip6-address {{ ip.address }}
+      next
+      {% endfor %}
+    end
     {% else %}
-    set mode dhcp
+    set ip6-mode dhcp
     {% endif %}
     
-    {# HABILITAR IPv6 EN LA INTERFAZ - CONEXIÓN CON HUAWEI #}
-    config ipv6
-      {% if intf.ipv6_addresses %}
-        {# Configuración estática IPv6 #}
-        set ip6-mode static
-        {% for ip in intf.ipv6_addresses %}
-        config ip6-address
-          edit {{ loop.index }}
-            set ip6-address {{ ip.address.ip }}/{{ ip.address.netmask }}
-            {% if huawei_connection and intf.name == huawei_connection.fortigate_interface %}
-            set comment "Connected to Huawei {{ huawei_connection.huawei_device }}"
-            {% endif %}
-          next
-        end
-        {% endfor %}
-      {% else %}
-        {# DHCPv6 o auto-config #}
-        {% if intf.role == 'wan' %}
-        set ip6-mode dhcp
-        {% else %}
-        set ip6-mode {# Modo automático para LAN #}
-        {% endif %}
+    {# IPv6 RA based on tags #}
+    {% set tag_names = intf.tags.all()|map(attribute='name')|list %}
+    config ip6-send-adv
+      set status {{ 'enable' if 'ipv6-ra' in tag_names else 'disable' }}
+      {% if 'ipv6-ra' in tag_names %}
+      set max-interval 600
+      set min-interval 200
       {% endif %}
-      
-      {# IMPORTANTE: Habilitar Router Advertisement si conecta a router #}
-      config ip6-send-adv
-        {% if huawei_connection and intf.name == huawei_connection.fortigate_interface %}
-        set status enable
-        set max-interval 600
-        set min-interval 200
-        set prefix-mode {# Modo de prefijo #}
-        {% else %}
-        set status disable
-        {% endif %}
-      end
     end
-    
-    {# Configuración básica #}
-    set status up
-    set allowaccess ping https ssh
-    {% if intf.mtu %}set mtu-override enable
-    set mtu {{ intf.mtu }}{% endif %}
-    
-  next
-{% endif %}
+  end
+  
+  set status up
+  set allowaccess ping https ssh
+next
 {% endfor %}
 end
 
-{# Configuración mínima de políticas IPv6 #}
+{# Firewall policies if there are interfaces #}
+{% if device.interfaces.all()|selectattr('enabled')|list %}
 config firewall policy6
-  {# Permitir tráfico entre todas las interfaces #}
   edit 1
-    set name "IPv6 Allow All Internal"
+    set name "IPv6 Internal Traffic"
     set srcintf "any"
     set dstintf "any"
     set srcaddr6 "all"
@@ -75,6 +60,11 @@ config firewall policy6
     set action accept
     set schedule "always"
     set service "ALL"
-    set utm-status enable
+    set logtraffic all
   next
 end
+{% endif %}
+ 
+       
+
+    
