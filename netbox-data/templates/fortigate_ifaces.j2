@@ -1,0 +1,80 @@
+{# fortigate_interfaces_simple.j2 #}
+{# Template simplificado solo para configuración de interfaces IPv6 #}
+
+config system interface
+{% for intf in interfaces %}
+{% if intf.enabled %}
+  edit "{{ intf.name }}"
+    set vdom "root"
+    {% if intf.description %}set description "{{ intf.description }}"{% endif %}
+    
+    {# Configuración IPv4 #}
+    {% if intf.ipv4_address %}
+    set ip {{ intf.ipv4_address }}
+    {% else %}
+    set mode dhcp
+    {% endif %}
+    
+    {# HABILITAR IPv6 EN LA INTERFAZ - CONEXIÓN CON HUAWEI #}
+    config ipv6
+      {% if intf.ipv6_addresses %}
+        {# Configuración estática IPv6 #}
+        set ip6-mode static
+        {% for ip in intf.ipv6_addresses %}
+        config ip6-address
+          edit {{ loop.index }}
+            set ip6-address {{ ip.address.ip }}/{{ ip.address.netmask }}
+            {% if huawei_connection and intf.name == huawei_connection.fortigate_interface %}
+            set comment "Connected to Huawei {{ huawei_connection.huawei_device }}"
+            {% endif %}
+          next
+        end
+        {% endfor %}
+      {% else %}
+        {# DHCPv6 o auto-config #}
+        {% if intf.role == 'wan' %}
+        set ip6-mode dhcp
+        {% else %}
+        set ip6-mode {# Modo automático para LAN #}
+        {% endif %}
+      {% endif %}
+      
+      {# IMPORTANTE: Habilitar Router Advertisement si conecta a router #}
+      config ip6-send-adv
+        {% if huawei_connection and intf.name == huawei_connection.fortigate_interface %}
+        set status enable
+        set max-interval 600
+        set min-interval 200
+        set prefix-mode {# Modo de prefijo #}
+        {% else %}
+        set status disable
+        {% endif %}
+      end
+    end
+    
+    {# Configuración básica #}
+    set status up
+    set allowaccess ping https ssh
+    {% if intf.mtu %}set mtu-override enable
+    set mtu {{ intf.mtu }}{% endif %}
+    
+  next
+{% endif %}
+{% endfor %}
+end
+
+{# Configuración mínima de políticas IPv6 #}
+config firewall policy6
+  {# Permitir tráfico entre todas las interfaces #}
+  edit 1
+    set name "IPv6 Allow All Internal"
+    set srcintf "any"
+    set dstintf "any"
+    set srcaddr6 "all"
+    set dstaddr6 "all"
+    set action accept
+    set schedule "always"
+    set service "ALL"
+    set utm-status enable
+  next
+end
