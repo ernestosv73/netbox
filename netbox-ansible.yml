@@ -5,6 +5,18 @@ mgmt:
 topology:
   nodes:
 
+    # Fortigate FW
+    fw:
+      kind: fortinet_fortigate
+      mgmt-ipv4: 172.80.80.6
+      image: vrnetlab/vr-fortios:6.4.1
+      env:
+        QEMU_SMP: 1
+        QEMU_MEMORY: 1024
+      ports:
+        - 80:80
+        - 443:443  
+    
     huawei-router:
       kind: huawei_vrp
       mgmt-ipv4: 172.80.80.7
@@ -33,16 +45,16 @@ topology:
        - chmod +x /root/nornir.sh
        - chmod 644 /root/automation/ansible.cfg    
     
-    gNMIc:
-      kind: linux
-      image: esanchezv/hellt-gnmic:latest
-      binds:
-        - configs/python_scapy.sh:/root/python_scapy.sh
-      exec:
-         - mkdir /data
-         - chmod +x /data
-         - chmod +x /root/python_scapy.sh
-         - bash /root/python_scapy.sh     
+    #gNMIc:
+      #kind: linux
+      #image: esanchezv/hellt-gnmic:latest
+      #binds:
+        #- configs/python_scapy.sh:/root/python_scapy.sh
+      #exec:
+         #- mkdir /data
+         #- chmod +x /data
+         #- chmod +x /root/python_scapy.sh
+         #- bash /root/python_scapy.sh     
 
     
     PC3:
@@ -58,8 +70,9 @@ topology:
         #- ip -6 route del default dev eth0    
       
   links:
+   - endpoints: ["huawei-router:eth2", "fw:eth1"]
    - endpoints: ["huawei-router:eth1", "srlswitch:e1-1"]  
-   - endpoints: ["srlswitch:e1-2", "gNMIc:eth1"]
+   #- endpoints: ["srlswitch:e1-2", "gNMIc:eth1"]
    - endpoints: ["srlswitch:e1-3", "PC3:eth1"]
    - endpoints: ["srlswitch:e1-4", "PC4:eth1"]   
    - endpoints: ["srlswitch:e1-5", "ansible:eth1"]   
