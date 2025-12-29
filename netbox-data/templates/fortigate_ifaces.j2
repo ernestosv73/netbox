@@ -1,23 +1,25 @@
-{# fortigate_netbox_template.j2 #}
+{# fortigate_like_huawei.j2 #}
+{# Estilo similar a tu template Huawei #}
+
 config system interface
-{% for intf in device.interfaces.all() if intf.enabled %}
+{% for intf in device.interfaces.all() | selectattr('enabled', '==', True) %}
+{% if intf.name %}
+
 edit "{{ intf.name }}"
   set vdom "root"
   {% if intf.description %}set description "{{ intf.description }}"{% endif %}
   
-  {# IPv4 Configuration #}
-  {% set ipv4_addresses = intf.ip_addresses.all()|selectattr('family.value', '==', 4)|list %}
-  {% if ipv4_addresses %}
-    {% for ip in ipv4_addresses %}
+  {# Direcciones IPv4 #}
+  {% set ipv4_addresses = intf.ip_addresses.all() | selectattr('family', 'equalto', 4) %}
+  {% for ip in ipv4_addresses %}
   set ip {{ ip.address }}
-    {% endfor %}
   {% else %}
   set mode dhcp
-  {% endif %}
+  {% endfor %}
   
-  {# IPv6 Configuration #}
+  {# Habilitar IPv6 si tiene direcciones IPv6 #}
+  {% set ipv6_addresses = intf.ip_addresses.all() | selectattr('family', 'equalto', 6) %}
   config ipv6
-    {% set ipv6_addresses = intf.ip_addresses.all()|selectattr('family.value', '==', 6)|list %}
     {% if ipv6_addresses %}
     set ip6-mode static
     config ip6-address
@@ -28,43 +30,15 @@ edit "{{ intf.name }}"
       {% endfor %}
     end
     {% else %}
-    set ip6-mode dhcp
+    set ip6-mode disable
     {% endif %}
-    
-    {# IPv6 RA based on tags #}
-    {% set tag_names = intf.tags.all()|map(attribute='name')|list %}
-    config ip6-send-adv
-      set status {{ 'enable' if 'ipv6-ra' in tag_names else 'disable' }}
-      {% if 'ipv6-ra' in tag_names %}
-      set max-interval 600
-      set min-interval 200
-      {% endif %}
-    end
   end
   
   set status up
   set allowaccess ping https ssh
 next
+
+{% endif %}
 {% endfor %}
 end
-
-{# Firewall policies if there are interfaces #}
-{% if device.interfaces.all()|selectattr('enabled')|list %}
-config firewall policy6
-  edit 1
-    set name "IPv6 Internal Traffic"
-    set srcintf "any"
-    set dstintf "any"
-    set srcaddr6 "all"
-    set dstaddr6 "all"
-    set action accept
-    set schedule "always"
-    set service "ALL"
-    set logtraffic all
-  next
-end
-{% endif %}
  
-       
-
-    
