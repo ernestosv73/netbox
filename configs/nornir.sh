@@ -8,3 +8,5 @@ pip install nornir-jinja2
 sleep 1
 pip install nornir-netbox
 sleep 1
+pip install nornir-scrapli
+sleep 1
