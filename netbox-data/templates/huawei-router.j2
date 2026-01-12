@@ -1,20 +1,29 @@
 sysname {{ device.name }}
+system-view
 
-{% for intf in device.interfaces.all() %}
-{% if intf.enabled %}
+{% for intf in device.interfaces.all() | selectattr('enabled', '==', True) %}
+{% if intf.name %}
+
 interface {{ intf.name }}
-{% if intf.description %}
- description {{ intf.description }}
-{% endif %}
+{% if intf.description %} description {{ intf.description }}{% endif %}
+ ipv6 enable
 
-{% for ip in intf.assigned_ips %}
-{% if ip.family.value == 4 %}
- ip address {{ ip.address }}
-{% elif ip.family.value == 6 %}
+{# Direcciones IPv6 #}
+{% set ipv6_addresses = intf.ip_addresses.all() | selectattr('family', 'equalto', 6) %}
+{% for ip in ipv6_addresses %}
  ipv6 address {{ ip.address }}
+{% endfor %}
+
+{# IPv6 RA usando Custom Field #}
+{% if intf.cf and intf.cf.ipv6_ra_enabled %}
+ undo ipv6 nd ra halt
+{% endif %}
+
+ undo shutdown
+quit
+
 {% endif %}
 {% endfor %}
 
- quit
-{% endif %}
-{% endfor %}
+commit
+return
