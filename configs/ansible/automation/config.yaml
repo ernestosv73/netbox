@@ -21,8 +21,8 @@ inventory:
     hostname_source: primary_ip
     platform: platform.slug
 
-    defaults:
-      username: admin
-      password: admin
+defaults:
+   username: admin
+   password: admin
 
 
