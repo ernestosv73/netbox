@@ -15,7 +15,7 @@ inventory:
 
     filter_parameters:
       manufacturer: huawei
-      platform: vrp
+      platform: huawei_vrp
       status: active
 
     hostname_source: primary_ip
