@@ -33,7 +33,7 @@ topology:
       startup-config: configs/srlswitch.cfg 
     
         
-    ansible:
+    nornir:
       kind: linux
       image: esanchezv/kali-python3:latest 
       binds:
@@ -64,6 +64,6 @@ topology:
    - endpoints: ["huawei-router:eth1", "srlswitch:e1-1"]  
    - endpoints: ["srlswitch:e1-3", "PC3:eth1"]
    - endpoints: ["srlswitch:e1-4", "PC4:eth1"]   
-   - endpoints: ["srlswitch:e1-5", "ansible:eth1"]   
+   - endpoints: ["srlswitch:e1-5", "nornir:eth1"]   
    
     
