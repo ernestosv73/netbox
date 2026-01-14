@@ -1,9 +1,0 @@
-# =========================
-# FortiGate Root Template
-# =========================
-
-config system global
-    set hostname {{ device.name }}
-end
-
-{% include "fortigate/interfaces.j2" %}
