@@ -1,20 +1,35 @@
-{# Depuración: IPv6 en port2 #}
-{% set target_intf = device.interfaces.get(name="port2") %}
-{% if target_intf and target_intf.enabled %}
 config system interface
-    edit "port2"
-        set vdom "root"
-        set type physical
+    edit "{{ intf.name }}"
+        {# VDOM #}
+        set vdom "{{ intf.custom_fields.fortigate_vdom | default('root') }}"
 
-        {# IPv6: usa .family.value correctamente #}
-        {% set ipv6_addresses = intf.ip_addresses.all() | selectattr('family', 'equalto', 6) %}
-        {% for ip in ipv6_addresses %} 
+        {# Tipo #}
+        set type {{ intf.custom_fields.fortigate_type | default('physical') }}
+
+        {# Alias (opcional) #}
+        {%- if intf.custom_fields.fortigate_alias | default('') -%}
+        set alias "{{ intf.custom_fields.fortigate_alias }}"
+        {%- endif -%}
+
+        set device-identification enable
+        set lldp-transmission enable
+
+        {# Rol (opcional, pero recomendado) #}
+        {%- if intf.custom_fields.fortigate_role | default('') -%}
+        set role {{ intf.custom_fields.fortigate_role }}
+        {%- endif -%}
+
+        {# IPv4 #}
+        {% for ip in intf.ip_addresses.all() | selectattr('family', 'equalto', 4) %}
+        set ip {{ ip.address.ip }} {{ ip.address.netmask }}
+        {% endfor %}
+
+        {# IPv6 #}
+        {% for ip in intf.ip_addresses.all() | selectattr('family', 'equalto', 6) %}
         config ipv6
             set ip6-address {{ ip.address }}
-            set ip6-allowaccess ping https
+            set ip6-allowaccess {{ intf.custom_fields.ip6_allowaccess | default('ping') }}
         end
         {% endfor %}
     next
 end
-{% endif %}
-    
