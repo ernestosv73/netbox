@@ -1,45 +1,30 @@
-{# fortigate_like_huawei.j2 #}
-{# Estilo similar a tu template Huawei #}
-
 config system interface
-{% for intf in device.interfaces.all() | selectattr('enabled', '==', True) %}
-{% if intf.name %}
+    edit "{{ intf.name }}"
+        set vdom "{{ intf.custom_fields.fortigate_vdom | default('root') }}"
+        set type {{ intf.custom_fields.fortigate_type | default('physical') }}
+        {%- if intf.custom_fields.fortigate_alias | default('') -%}
+        set alias "{{ intf.custom_fields.fortigate_alias }}"
+        {%- endif -%}
+        set device-identification enable
+        set lldp-transmission enable
+        {%- if intf.custom_fields.fortigate_role | default('') -%}
+        set role {{ intf.custom_fields.fortigate_role }}
+        {%- endif -%}
 
-edit "{{ intf.name }}"
-  set vdom "root"
-  {% if intf.description %}set description "{{ intf.description }}"{% endif %}
-  
-  {# Direcciones IPv4 #}
-  {% set ipv4_addresses = intf.ip_addresses.all() | selectattr('family', 'equalto', 4) %}
-  {% for ip in ipv4_addresses %}
-  set ip {{ ip.address }}
-  {% else %}
-  set mode dhcp
-  {% endfor %}
-  
-  {# Habilitar IPv6 si tiene direcciones IPv6 #}
-  {% set ipv6_addresses = intf.ip_addresses.all() | selectattr('family', 'equalto', 6) %}
-  config ipv6
-    {% if ipv6_addresses %}
-    set ip6-mode static
-    config ip6-address
-      {% for ip in ipv6_addresses %}
-      edit {{ loop.index }}
-        set ip6-address {{ ip.address }}
-      next
-      {% endfor %}
-    end
-    {% else %}
-    set ip6-mode disable
-    {% endif %}
-  end
-  
-  set status up
-  set allowaccess ping https ssh
-next
+        {# IPv4 #}
+        {% for ip in intf.ip_addresses.all() | selectattr('family.value', '==', 4) %}
+        set ip {{ ip.address.ip }} {{ ip.address.netmask }}
+        {% endfor %}
 
-{% endif %}
-{% endfor %}
+        {# IPv6 #}
+        {% for ip in intf.ip_addresses.all() | selectattr('family.value', '==', 6) %}
+        config ipv6
+            set ip6-address {{ ip.address }}
+            set ip6-allowaccess {{ intf.custom_fields.ip6_allowaccess | default('ping') }}
+        end
+        {% endfor %}
+    next
 end
- 
+
+
           
