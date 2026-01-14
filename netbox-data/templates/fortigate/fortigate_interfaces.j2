@@ -7,16 +7,16 @@ config system interface
         set type {{ intf.custom_fields.fortigate_type | default('physical') }}
 
         {# Alias (opcional) #}
-        {%- if intf.custom_fields.fortigate_alias | default('') -%}
-        set alias "{{ intf.custom_fields.fortigate_alias }}"
+        {%- if intf.custom_fields.alias | default('') -%}
+        set alias "{{ intf.custom_fields.alias }}"
         {%- endif -%}
 
         set device-identification enable
         set lldp-transmission enable
 
         {# Rol (opcional, pero recomendado) #}
-        {%- if intf.custom_fields.fortigate_role | default('') -%}
-        set role {{ intf.custom_fields.fortigate_role }}
+        {%- if intf.custom_fields.iface_role | default('') -%}
+        set role {{ intf.custom_fields.iface_role | lower }}
         {%- endif -%}
 
         {# IPv4 #}
@@ -33,3 +33,4 @@ config system interface
         {% endfor %}
     next
 end
+    
