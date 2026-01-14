@@ -1,0 +1,20 @@
+{# Depuración: IPv6 en port2 #}
+{% set target_intf = device.interfaces.get(name="port2") %}
+{% if target_intf and target_intf.enabled %}
+config system interface
+    edit "port2"
+        set vdom "root"
+        set type physical
+
+        {# IPv6: usa .family.value correctamente #}
+        {% set ipv6_addresses = intf.ip_addresses.all() | selectattr('family', 'equalto', 6) %}
+        {% for ip in ipv6_addresses %} 
+        config ipv6
+            set ip6-address {{ ip.address }}
+            set ip6-allowaccess ping https
+        end
+        {% endfor %}
+    next
+end
+{% endif %}
+    
