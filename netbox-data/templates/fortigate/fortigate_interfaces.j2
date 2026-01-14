@@ -7,7 +7,8 @@ config system interface
         set type physical
 
         {# IPv6: usa .family.value correctamente #}
-        {% for ip in target_intf.ip_addresses.all() | selectattr('family.value', 'equalto', 6) %}
+        {% set ipv6_addresses = intf.ip_addresses.all() | selectattr('family', 'equalto', 6) %}
+        {% for ip in ipv6_addresses %} 
         config ipv6
             set ip6-address {{ ip.address }}
             set ip6-allowaccess ping https
