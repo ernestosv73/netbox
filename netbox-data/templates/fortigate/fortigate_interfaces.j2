@@ -1,51 +1,31 @@
-# =========================
-# Interfaces
-# =========================
-
 config system interface
+    edit "{{ intf.name }}"
+        set vdom "{{ intf.custom_fields.fortigate_vdom | default('root') }}"
+        set type {{ intf.custom_fields.fortigate_type | default('physical') }}
+        {% if intf.custom_fields.fortigate_alias %}
+        set alias "{{ intf.custom_fields.fortigate_alias }}"
+        {% endif %}
+        set device-identification enable
+        set lldp-transmission enable
+        {% if intf.custom_fields.fortigate_role %}
+        set role {{ intf.custom_fields.fortigate_role }}
+        {% endif %}
 
-{% for intf in device.interfaces.all() if intf.enabled %}
-edit "{{ intf.name }}"
+        {# --- IPv4 --- #}
+        {% for ip in intf.ip_addresses.all() | selectattr('family.value', '==', 4) %}
+        set ip {{ ip.address.ip }} {{ ip.address.netmask }}
+        {% endfor %}
 
-{% if intf.cf.vdom %}
-    set vdom "{{ intf.cf.vdom }}"
-{% endif %}
-
-{% if intf.type %}
-    set type {{ intf.type }}
-{% endif %}
-
-{% if intf.cf.alias %}
-    set alias "{{ intf.cf.alias }}"
-{% endif %}
-
-{% if intf.cf.role %}
-    set role {{ intf.cf.role }}
-{% endif %}
-
-{% if intf.cf.device_identification %}
-    set device-identification enable
-{% endif %}
-
-{% if intf.cf.lldp_transmission %}
-    set lldp-transmission enable
-{% endif %}
-
-{# IPv6 config #}
-{% set ipv6_addrs = intf.ip_addresses.all() | selectattr("family.value", "equalto", 6) | list %}
-{% if ipv6_addrs %}
-    config ipv6
-    {% for ip in ipv6_addrs %}
-        set ip6-address {{ ip.address }}
-    {% endfor %}
-
-    {% if intf.cf.allowaccess_v6 %}
-        set ip6-allowaccess {{ intf.cf.allowaccess_v6 | join(" ") }}
-    {% endif %}
-    end
-{% endif %}
-
-next
-{% endfor %}
-
+        {# --- IPv6 --- #}
+        {% for ip in intf.ip_addresses.all() | selectattr('family.value', '==', 6) %}
+        config ipv6
+            set ip6-address {{ ip.address }}
+            {% if intf.custom_fields.ip6_allowaccess %}
+            set ip6-allowaccess {{ intf.custom_fields.ip6_allowaccess }}
+            {% else %}
+            set ip6-allowaccess ping
+            {% endif %}
+        end
+        {% endfor %}
+    next
 end
