@@ -1,22 +1,22 @@
 config system interface
     edit "{{ intf.name }}"
         {# VDOM #}
-        set vdom "{{ intf.custom_fields.fortigate_vdom | default('root') }}"
+        set vdom "{{ intf.cf.fortigate_vdom | default('root') }}"
 
         {# Tipo #}
-        set type {{ intf.custom_fields.fortigate_type | default('physical') }}
+        set type {{ intf.cf.fortigate_type | default('physical') }}
 
         {# Alias (opcional) #}
-        {%- if intf.custom_fields.alias | default('') -%}
-        set alias "{{ intf.custom_fields.alias }}"
+        {%- if intf.cf.alias | default('') -%}
+        set alias "{{ intf.cf.alias }}"
         {%- endif -%}
 
         set device-identification enable
         set lldp-transmission enable
 
         {# Rol (opcional, pero recomendado) #}
-        {%- if intf.custom_fields.iface_role | default('') -%}
-        set role {{ intf.custom_fields.iface_role | lower }}
+        {%- if intf.cf.iface_role | default('') -%}
+        set role {{ intf.cf.iface_role | lower }}
         {%- endif -%}
 
         {# IPv4 #}
@@ -28,9 +28,8 @@ config system interface
         {% for ip in intf.ip_addresses.all() | selectattr('family', 'equalto', 6) %}
         config ipv6
             set ip6-address {{ ip.address }}
-            set ip6-allowaccess {{ intf.custom_fields.ip6_allowaccess | default('ping') }}
+            set ip6-allowaccess {{ intf.cf.ip6_allowaccess | default('ping') }}
         end
         {% endfor %}
     next
 end
-    
