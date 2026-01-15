@@ -1,5 +1,4 @@
 system view
-snetconf server enable
 interface Ethernet 1/0/0
 ipv6 enable
 ipv6 address 2001:db8:30::1/64
