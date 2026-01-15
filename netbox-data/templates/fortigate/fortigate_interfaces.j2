@@ -7,17 +7,17 @@ config system interface
         set type {{ intf.cf.fortigate_type | default('physical') }}
 
         {# Alias (opcional) #}
-        {%- if intf.cf.alias | default('') -%}
+        {%- if intf.cf.alias | default('') %}
         set alias "{{ intf.cf.alias }}"
-        {%- endif -%}
+        {%- endif %}
 
         set device-identification enable
         set lldp-transmission enable
 
         {# Rol (opcional, pero recomendado) #}
-        {%- if intf.cf.iface_role | default('') -%}
+        {%- if intf.cf.iface_role | default('') %}
         set role {{ intf.cf.iface_role | lower }}
-        {%- endif -%}
+        {%- endif %}
 
         {# IPv4 #}
         {% for ip in intf.ip_addresses.all() | selectattr('family', 'equalto', 4) %}
